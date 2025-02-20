@@ -3,6 +3,7 @@ import git
 from git import Actor
 from github import Github
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 import json
 from datetime import datetime
 from pyngrok import ngrok
@@ -15,10 +16,14 @@ if not GITHUB_HOOK_TOKEN:
 REPO_NAME = "lovable-mock-repo"
 LOCAL_REPO_PATH = "./mock_repo"
 LOVABLE_BOT_NAME = "lovable-bot"
-PORT = 5001
+PORT = 5001  # Changed to 5001 to avoid AirPods conflict
 
-# Initialize Flask app for webhook
+# Initialize Flask app for webhook and UI
 app = Flask(__name__)
+CORS(app, resources={r"/prompt": {"origins": "http://localhost:5173"}})  # Allow React on port 5173
+
+# Global to store ngrok tunnel URL
+NGROK_WEBHOOK_URL = None
 
 # Prompt history store (in-memory, no timestamps)
 prompt_history = []
@@ -26,6 +31,9 @@ last_manual_commit_time = None
 
 # Step 1: Initialize Git Repo and Push to GitHub
 def init_repo(webhook_url):
+    global NGROK_WEBHOOK_URL
+    NGROK_WEBHOOK_URL = webhook_url  # Store for reuse
+
     g = Github(GITHUB_HOOK_TOKEN)
     user = g.get_user()
     try:
@@ -105,13 +113,12 @@ def webhook():
             }
             response = requests.get(diff_url, headers=headers)
             if response.status_code == 200:
-                # Extract only the added lines from the diff
                 diff_lines = response.text.splitlines()
                 changes = [line[1:] for line in diff_lines if line.startswith("+") and not line.startswith("+++")]
             else:
                 changes = [f"Failed to fetch diff: {response.status_code}"]
             
-            manual_diffs.append(changes)  # Just the list of added lines
+            manual_diffs.append(changes)
     
     if manual_diffs:
         fine_tune_data = {
@@ -125,15 +132,33 @@ def webhook():
     
     return jsonify({"status": "processed"}), 200
 
-if __name__ == "__main__":
-    ngrok_tunnel = ngrok.connect(PORT, bind_tls=True)
-    WEBHOOK_URL = f"{ngrok_tunnel.public_url}/webhook"
-    print(f"ngrok tunnel established: {WEBHOOK_URL}")
+# Step 4: New Endpoint for Prompt Submission
+@app.route("/prompt", methods=["POST"])
+def submit_prompt():
+    data = request.json
+    if not data or "prompt" not in data:
+        return jsonify({"error": "Prompt is required"}), 400
     
-    repo, github_repo = init_repo(WEBHOOK_URL)
+    prompt = data["prompt"]
+    # Use existing repo if available, reinitialize if not
+    if os.path.exists(LOCAL_REPO_PATH):
+        repo = git.Repo(LOCAL_REPO_PATH)
+    else:
+        repo, _ = init_repo(NGROK_WEBHOOK_URL)  # Use stored ngrok URL
+    handle_prompt(prompt, repo)
+    
+    return jsonify({"message": "Prompt processed", "prompt_history": prompt_history})
+
+if __name__ == "__main__":
+    # Start ngrok tunnel once
+    ngrok_tunnel = ngrok.connect(PORT, bind_tls=True)
+    NGROK_WEBHOOK_URL = f"{ngrok_tunnel.public_url}/webhook"
+    print(f"ngrok tunnel established: {NGROK_WEBHOOK_URL}")
+    
+    repo, github_repo = init_repo(NGROK_WEBHOOK_URL)
     
     handle_prompt("Add a login page", repo)
     handle_prompt("Fix the button styling", repo)
     
-    print(f"Webhook server running at {WEBHOOK_URL}")
+    print(f"Webhook server running at {NGROK_WEBHOOK_URL}")
     app.run(host="0.0.0.0", port=PORT)

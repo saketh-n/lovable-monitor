@@ -8,6 +8,7 @@ This tool helps Lovable’s team improve the AI by identifying where it misunder
 ## Setup
 
 ### Prerequisites
+
 - Python 3.9+- Git installed
 - A GitHub Personal Access Token with `repo` and `admin:repo_hook` scopes
 - Sign up for `ngrok` and follow their setup instructions
@@ -61,9 +62,33 @@ git push
 {"manual_diffs": [["Manual edit 3"]], "prompt_history": ["Add a login page", "Fix the button styling"]}
 ```
 
+### Running the Frontend (UI)
+The project includes a React-based UI built with Vite to mock Lovable prompts. Follow these steps:
+
+1. **Navigate to the UI Folder**:
+```bash
+cd ui
+``` 
+
+2. **Install Dependencies**:
+```bash
+npm install
+```
+
+3. **Run the Development Server**:
+```bash
+npm run dev
+```
+- Open your browser and navigate to `http://localhost:5173` to see the UI.
+
+4. **Submit a Prompt**:
+- Use the "Ask Lovable..." input to enter prompts (e.g., "Implement job board UI")
+- The UI displays the prompt history and sends requests to the backend, which commits prompts to GitHub as `lovable-bot`
+
 ## Notes
 - Only added lines from manual diffs are included, paired with all prompts from the time of the last manual change
 - Webhook: Uses `ngrok` for a dynamic URL-each run will have a new one
+- Frontend will not work if the backend is not running
 
 
 

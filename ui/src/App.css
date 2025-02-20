@@ -1,0 +1,80 @@
+.App {
+  text-align: center;
+  background-color: #1a1a1a;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: white;
+  font-family: Arial, sans-serif;
+}
+
+.App-header {
+  padding: 20px;
+}
+
+h1 {
+  font-size: 2em;
+  margin-bottom: 10px;
+}
+
+p {
+  color: #b0b0b0;
+  margin-bottom: 20px;
+}
+
+.prompt-form {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.prompt-input {
+  padding: 10px;
+  font-size: 1em;
+  border: 1px solid #4a4a4a;
+  border-radius: 5px;
+  background-color: #2a2a2a;
+  color: white;
+  width: 300px;
+}
+
+.submit-button {
+  padding: 10px 20px;
+  font-size: 1em;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.submit-button:hover {
+  background-color: #0056b3;
+}
+
+.prompt-history {
+  max-width: 400px;
+  margin-top: 20px;
+}
+
+.prompt-card {
+  background-color: #3a3a3a;
+  padding: 10px;
+  margin: 5px 0;
+  border-radius: 5px;
+  border-left: 4px solid #007bff;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  text-align: left;
+}
+
+.prompt-number {
+  background-color: #007bff;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 10px;
+  margin-right: 10px;
+  font-size: 0.9em;
+}
