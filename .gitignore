@@ -1,0 +1,3 @@
+# .gitignore
+mock_repo/
+fine_tune_data.json
