@@ -4,6 +4,7 @@ from git import Actor
 from github import Github
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+from flask_socketio import SocketIO, emit
 import json
 from datetime import datetime
 from pyngrok import ngrok
@@ -21,6 +22,7 @@ PORT = 5001  # Changed to 5001 to avoid AirPods conflict
 # Initialize Flask app for webhook and UI
 app = Flask(__name__)
 CORS(app, resources={r"/prompt": {"origins": "http://localhost:5173"}})  # Allow React on port 5173
+socketio = SocketIO(app, cors_allowed_origins=["http://localhost:5173"])
 
 # Global to store ngrok tunnel URL
 NGROK_WEBHOOK_URL = None
@@ -129,6 +131,9 @@ def webhook():
         with open("fine_tune_data.json", "a") as f:
             f.write(json.dumps(fine_tune_data) + "\n")
         print("Fine-tune data packaged:", fine_tune_data)
+
+        # Emit WebSocket event for real-time updates
+        socketio.emit('update_finetune', fine_tune_data)
     
     return jsonify({"status": "processed"}), 200
 
@@ -149,6 +154,15 @@ def submit_prompt():
     
     return jsonify({"message": "Prompt processed", "prompt_history": prompt_history})
 
+@socketio.on('connect')
+def handle_connect():
+    print("Client connected")
+    socketio.emit('test', {'message': 'Hello from server'})
+
+@socketio.on('disconnect')
+def handle_disconnect():
+    print("Client disconnected")
+
 if __name__ == "__main__":
     # Start ngrok tunnel once
     ngrok_tunnel = ngrok.connect(PORT, bind_tls=True)
@@ -161,4 +175,4 @@ if __name__ == "__main__":
     handle_prompt("Fix the button styling", repo)
     
     print(f"Webhook server running at {NGROK_WEBHOOK_URL}")
-    app.run(host="0.0.0.0", port=PORT)
+    socketio.run(app, host="0.0.0.0", port=PORT)

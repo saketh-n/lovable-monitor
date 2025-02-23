@@ -2,8 +2,7 @@
   text-align: center;
   background-color: #1a1a1a;
   min-height: 100vh;
-  display: flex;
-  flex-direction: column;
+  min-width: 100vw;
   align-items: center;
   color: white;
   font-family: Arial, sans-serif;
@@ -11,6 +10,8 @@
 
 .App-header {
   padding: 20px;
+  width: 100%;
+  text-align: left;
 }
 
 h1 {
@@ -36,7 +37,8 @@ p {
   border-radius: 5px;
   background-color: #2a2a2a;
   color: white;
-  width: 300px;
+  width: 400px;
+  max-width: 400px;
 }
 
 .submit-button {
@@ -53,9 +55,57 @@ p {
   background-color: #0056b3;
 }
 
+.content-container {
+  width: 100%;
+}
+
+.main-content {
+  display: flex;
+  justify-content: space-between;
+  gap: 40px;
+  padding: 0 20px;
+  width: 100%;
+}
+
+.prompt-history, .manual-changes {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
 .prompt-history {
   max-width: 400px;
-  margin-top: 20px;
+}
+
+.manual-changes {
+  max-width: 50%;
+}
+
+.manual-changes .diff-card,
+.manual-changes-prompt-card {
+  width: 400px;
+  max-width: 400px;
+  background-color: #3a3a3a;
+  padding: 10px;
+  margin: 5px 0;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  text-align: left;
+}
+
+.manual-changes-prompt-card {
+  border-left: 4px solid #007bff;
+}
+
+/* Center the section titles */
+.manual-changes h2,
+.manual-changes h3 {
+  width: 400px;
+  text-align: center;
+  margin-bottom: 15px;
 }
 
 .prompt-card {
@@ -77,4 +127,26 @@ p {
   border-radius: 10px;
   margin-right: 10px;
   font-size: 0.9em;
+}
+
+.diff-card {
+  background-color: #3a3a3a;
+  padding: 10px;
+  margin: 5px 0;
+  border-radius: 5px;
+  border-left: 4px solid #ff4444;
+  text-align: left;
+}
+
+/* Remove the prompt-history from combined selector */
+.prompt-history {
+  flex: 1;
+  min-width: 0;
+  max-width: 400px;
+}
+
+/* Remove centering from prompt-history title */
+.prompt-history h2 {
+  text-align: left;
+  margin-bottom: 15px;
 }

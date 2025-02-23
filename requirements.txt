@@ -3,3 +3,5 @@ pygithub==2.3.0
 flask==3.0.3
 pyngrok==7.1.6
 requests==2.32.3
+flask-cors==4.0.1
+flask-socketio==5.3.6
